@@ -22,7 +22,7 @@ int LeftWall = 0;
 //int UpperWall = 0;
 int bottomWall = WIDTH -( 2 * BALL_RADIUS) ;
 	
-	private double Vx =7;    //rgen.nextDouble(1.0 , 11.0);
+	private double Vx =rgen.nextDouble(1.0 , 11.0);
 	
 
 	private double Vy = rgen.nextDouble(1.0 , 10.0); ;
@@ -39,50 +39,6 @@ int bottomWall = WIDTH -( 2 * BALL_RADIUS) ;
 	
 	}
 
-	private void MoveUpWard()
-	{
-		double RightWall= (WIDTH - 2* BALL_RADIUS) - (( WIDTH /2) -BALL_RADIUS ) ;
-		double bottomWall=  (HEIGHT - 2* BALL_RADIUS) - (( HEIGHT /2) -BALL_RADIUS ) ;
-		int centerX=(WIDTH /2) - (BALL_RADIUS);
-		int centerY= (HEIGHT / 2) - (BALL_RADIUS);
-
-		while (  ((Ball.getX() - centerX) < RightWall) &&   ( (Ball.getY() - centerY) < bottomWall) && (Ball.getX() > 0 ) )   
-		{	
-			if  (( Ball.getX() <  RightWall )  &&  (Ball.getX() > 0 ) )
-			{
-				print(" \n Ball.getX() " +Ball.getX() );
-				print("\n (WIDTH /2) - (BALL_RADIUS) " +((WIDTH /2) - (BALL_RADIUS)));
-				print(" \n RightWall " +RightWall);
-				pause(50);
-				Ball.move(Vx, Vy);
-				
-			}
-			
-			if (Ball.getY() < bottomWall) 
-			{
-				pause(50);
-				Ball.move(Vx, Vy);
-			}
-			
-			
-		}
-			
-	
-		
-	}
-
-	private void MoveBallDownward() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void BallInitialPosition() {
-		
-		Ball= new GOval( (WIDTH /2) - (BALL_RADIUS) , (HEIGHT / 2) - (BALL_RADIUS) , 2* BALL_RADIUS , 2* BALL_RADIUS);
-		Ball.setFilled(true);
-		add(Ball);
-	}
-
 	private void CreatWindow() {
 		
 		GRect GameBoard = new GRect(0 , 0, WIDTH , HEIGHT );
@@ -90,5 +46,67 @@ int bottomWall = WIDTH -( 2 * BALL_RADIUS) ;
 		add(GameBoard);
 	}
 		
+	
+	private void BallInitialPosition() {
+		
+		Ball= new GOval( (WIDTH /2) - (BALL_RADIUS) , (HEIGHT / 2) - (BALL_RADIUS) , 2* BALL_RADIUS , 2* BALL_RADIUS);
+		Ball.setFilled(true);
+		add(Ball);
+	}
+
+
+	private void MoveBallDownward()
+	{
+		int bottomWall = ( HEIGHT - ( 2 * BALL_RADIUS));
+		int rightWall = ( WIDTH - ( 2 * BALL_RADIUS));
+		int leftWall= 0;
+		int topWall = 0;
+		
+		
+		while(  ( Ball.getX() > rightWall)  ||  (Ball.getY() > bottomWall)   ||   (Ball.getY() > topWall)     ||      (Ball.getX() > leftWall))
+		{
+			pause(50);
+			int distanceToRightWall = (int) (rightWall - Ball.getX());
+			int distanceToBottomWall = (int) (bottomWall - Ball.getY()); 
+			int distanceToLeftWall = (int) (  Ball.getX() - leftWall);
+			int tempVelocityInXDirection = (int) Vx;
+			int distanceToTopWall = (int) (Ball.getY() - topWall);
+			if ((distanceToRightWall < Vx))
+			{
+				Ball.move(distanceToRightWall, Vy);
+				Vx = -Vx;
+			}
+			else if((distanceToLeftWall < -Vx))
+			{
+				Ball.move( -distanceToLeftWall, Vy);
+				Vx = -Vx;
+			}
+			else if( (distanceToBottomWall < Vy))
+			{
+				Ball.move(Vx, distanceToBottomWall);
+				Vy=-Vy;
+			}
+			else if( (distanceToTopWall < -Vy))
+			{
+				Ball.move(Vx ,-distanceToTopWall);
+				Vy=-Vy;
+			}
+			else
+			{
+				Ball.move(Vx, Vy);
+			}
+		}
+	}
+
+	private void MoveUpWard()
+	{
+		
+				
+	
+		
+	}
+
+
+
 		
 	}

@@ -64,31 +64,29 @@ public class Breakout extends GraphicsProgram {
 	
 	
 	private RandomGenerator rgen= RandomGenerator.getInstance();
-	
+	private GRect [] [] arrayForBriks= new GRect[10][10];
 
 	/** VELOCITY of x and y for ball
 	 */
-	private double Vx =  rgen.nextDouble(1.0 , 3.0);
-	private double Vy = 2 ;
+	private double Vx =  rgen.nextDouble(1.0 , 6);
+	private double Vy = 5; 
 	
 	private boolean mouseDragged = true;
+	private boolean isMouseMoving = false;
 	
 	private GPoint Last_XYCoOrdinates = new GPoint(2, ( HEIGHT - PADDLE_Y_OFFSET ));
 
 	/* Method: init() */
 	/** Sets up the Breakout program. */
-	public void init() {
+	public void init() 
+	{
+		
 		CreatWindow();
 		CreateBrisk();
 		CreatePaddle();
-		addMouseListeners();
+		//addMouseListeners();
 		BallInitialPosition();
-		if(mouseDragged== true)
-		{	
-			MoveBallDownward();
-			pause(10);
-		}
-		MoveUpWard();
+		
 		
 	}
 
@@ -99,7 +97,12 @@ public class Breakout extends GraphicsProgram {
 	public void run() {
 		/* You fill this in, along with any subsidiary methods */
 		addMouseListeners();
+		//if( mouseDragged = false )
+		//{
+			MovaBall();
+		//}
 	}
+		
 	
 	private void CreatWindow() 
 	{
@@ -121,32 +124,32 @@ public class Breakout extends GraphicsProgram {
 		{
 			for (int i = 0; i < NBRICKS_PER_ROW; i++)
 			{	
-				GRect CreateBrisk= new GRect( 2 +(BRICK_WIDTH * i) + (BRICK_SEP* (i)) , BRICK_Y_OFFSET + (j * (BRICK_HEIGHT+ BRICK_SEP)), BRICK_WIDTH, BRICK_HEIGHT);
-				CreateBrisk.setFilled(true);
-				if((j <= 2))
+				arrayForBriks[i][j]= new GRect( 2 +(BRICK_WIDTH * i) + (BRICK_SEP* (i)) , BRICK_Y_OFFSET + (j * (BRICK_HEIGHT+ BRICK_SEP)), BRICK_WIDTH, BRICK_HEIGHT);
+				arrayForBriks[i][j].setFilled(true);
+				if((j < 2))
 				{
-					CreateBrisk.setColor(Color.RED);
+					arrayForBriks[i][j].setColor(Color.RED);
 				}
-				if(( j > 2 ) && (j <= 4))
+				if(( j >=2 ) && (j <= 3))
 				{
-					CreateBrisk.setColor(Color.ORANGE);
-				}
-				
-				if(( j > 4 ) && (j <= 6))
-				{
-					CreateBrisk.setColor(Color.YELLOW);
+					arrayForBriks[i][j].setColor(Color.ORANGE);
 				}
 				
-				if(( j > 6 ) && (j <= 8))
+				if(( j > 3 ) && (j <= 5))
 				{
-					CreateBrisk.setColor(Color.GREEN);
+					arrayForBriks[i][j].setColor(Color.YELLOW);
 				}
 				
-				if(( j > 8 ) && (j <= 10))
+				if(( j > 5 ) && (j <= 7))
 				{
-					CreateBrisk.setColor(Color.CYAN);
+					arrayForBriks[i][j].setColor(Color.GREEN);
 				}
-				add(CreateBrisk);
+				
+				if(( j > 7) && (j <10))
+				{
+					arrayForBriks[i][j].setColor(Color.CYAN);
+				}
+				add(arrayForBriks[i][j]);
 				//print("\n X- Co-Ordinate " +(2 +(BRICK_WIDTH * i) + (BRICK_SEP* (i))));
 			}
 		}
@@ -164,14 +167,15 @@ public class Breakout extends GraphicsProgram {
 	}
 	
 
-	public void mousePressed(MouseEvent e)
+	 public void mousePressed(MouseEvent e)
 	{
 		Last_XYCoOrdinates = new GPoint( e.getPoint());
 		GRect tempPaddle  = (GRect) getElementAt(Last_XYCoOrdinates);
 		if (tempPaddle == CreatePaddle)
 		{
-			print(" \n Last_XYCoOrdinates "  +Last_XYCoOrdinates);
+			
 			paddleToMove = tempPaddle;
+			isMouseMoving=true;
 		}
 		else
 			paddleToMove=null;
@@ -200,35 +204,87 @@ public class Breakout extends GraphicsProgram {
 		Ball= new GOval( (WIDTH /2) - (BALL_RADIUS) , (HEIGHT / 2) - (BALL_RADIUS) , 2* BALL_RADIUS , 2* BALL_RADIUS);
 		Ball.setFilled(true);
 		add(Ball);
-		print("center   " +((WIDTH /2) - (BALL_RADIUS)));
-		print("\n"+((HEIGHT / 2) - (BALL_RADIUS)));
+	
 	}
 
 
 
-	private void MoveBallDownward()
+	private void MovaBall()
 	{
-		while( Ball.getY() < ( HEIGHT - (2 * BALL_RADIUS) ))
-		{ 
-		 	
-			if(Ball.getX() < WIDTH - (2 * BALL_RADIUS))
+		int bottomWall = ( HEIGHT - ( 2 * BALL_RADIUS));
+		int rightWall = ( WIDTH - ( 2 * BALL_RADIUS));
+		int leftWall= 0;
+		int topWall = 0;
+		
+		
+		while( ( Ball.getX() > rightWall)  ||  (Ball.getY() > bottomWall)   ||   (Ball.getY() > topWall)     ||      (Ball.getX() > leftWall))
+		{
+			/* if(isMouseMoving == false)
 			{
-				Ball.move(Vx, Vy);
+				continue;
+			}*/
+
+			
+					pause(30);
+					int distanceToRightWall = (int) (rightWall - Ball.getX());
+					int distanceToBottomWall = (int) (bottomWall - Ball.getY()); 
+					int distanceToLeftWall = (int) (  Ball.getX() - leftWall);
+					int tempVelocityInXDirection = (int) Vx;
+					int distanceToTopWall = (int) (Ball.getY() - topWall);
+					
+					int yCoOrdinateOfPaddle = (int) CreatePaddle.getY();
+					int xCoOrdinateOfPaddle = (int) CreatePaddle.getX();
+					int xCoOrdinateOfBallNearPaddle = (int) Ball.getX() + (2 *BALL_RADIUS );
+					int yCoOrdinateOfBallNearPaddle = (int) Ball.getY() + (2 *BALL_RADIUS );
+					if ((distanceToRightWall <= Vx))
+					{
+						Ball.move(distanceToRightWall, Vy);
+						Vx = -Vx;
+					}
+					else if((distanceToLeftWall <= -Vx))
+					{
+						Ball.move( -distanceToLeftWall, Vy);
+						Vx = -Vx;
+					}
+					else if( (distanceToBottomWall <= Vy))
+					{
+						Ball.move(Vx, distanceToBottomWall);
+						Vy=-Vy;
+					}
+					else if( (distanceToTopWall <=-Vy))
+					{
+						Ball.move(Vx ,-distanceToTopWall);
+						Vy=-Vy;
+					}
+					else if( (0 <= ( xCoOrdinateOfBallNearPaddle - xCoOrdinateOfPaddle ))   && ((xCoOrdinateOfBallNearPaddle - xCoOrdinateOfPaddle ) <= (PADDLE_WIDTH - 2 * BALL_RADIUS))  &&  (yCoOrdinateOfPaddle - yCoOrdinateOfBallNearPaddle) <= Vy   )
+					{
+						Ball.move(Vx, (yCoOrdinateOfPaddle - yCoOrdinateOfBallNearPaddle));
+						Vy=-Vy;
+					}
+			
+					else
+					{
+						for(int j = 0 ; j < 10 ; j++ )
+						{
+							for (int i = 0; i < NBRICKS_PER_ROW; i++)
+							{
+								if( ( (Ball.getY() - (arrayForBriks[i][j].getY() + HEIGHT)) <= -Vy) && ( (Ball.getY() - (arrayForBriks[i][j].getY() + HEIGHT)) >= 0)  &&  ( arrayForBriks[i][j].getX() <= (Ball.getX() + BALL_RADIUS) && ( Ball.getX() + BALL_RADIUS <= (arrayForBriks[i][j].getX() + WIDTH ) ))  ) 
+								{
+									
+									remove(arrayForBriks[i][j]);
+									Ball.move(Vx, Vy);
+									Vy=-Vy;
+									break;
+								}
+							}
+						}
+						Ball.move(Vx, Vy);
+				
+				
 			}
-			else
-				break;
 		}
 		
 	}
-
-
-
-	private void MoveUpWard() {
-		// TODO Auto-generated method stub
-		
-	}
-
-
 
 }
 
