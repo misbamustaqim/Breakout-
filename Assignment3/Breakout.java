@@ -71,8 +71,8 @@ public class Breakout extends GraphicsProgram {
 
 	/** VELOCITY of x and y for ball
 	 */
-	private double Vx = 5;         // rgen.nextDouble(1.0 , 10);
-	private double Vy = rgen.nextDouble(10,30); 
+	private double Vx = rgen.nextDouble(3,8);         // rgen.nextDouble(1.0 , 10);
+	private double Vy = 7; 
 	
 	
 	private boolean isMouseClicked = false;
@@ -241,7 +241,7 @@ public class Breakout extends GraphicsProgram {
 			}*/
 
 			
-					pause(30);
+					pause(5);
 					int distanceToRightWall = (int) (rightWall - Ball.getX());
 					int distanceToBottomWall = (int) (bottomWall - Ball.getY()); 
 					int distanceToLeftWall = (int) (  Ball.getX() - leftWall);
@@ -317,7 +317,7 @@ public class Breakout extends GraphicsProgram {
 									double X2OfCircle = Ball.getX() ;
 									double y2OfCircle = Ball.getY() + (2 * BALL_RADIUS);
 									
-									boolean bottomEdgeMax = ( (yOfCircle - y1Bricks) <= -Vy);
+									boolean bottomEdgeMax = ( (yOfCircle - y1Bricks) < -Vy);
 									boolean bottomEdgeMin = ( ( yOfCircle -y1Bricks ) >= 0);
 									boolean leftEdge = (x1Bricks <= XOfCircle);
 									boolean rightEdge = XOfCircle <= (x1Bricks + BRICK_WIDTH +1);
@@ -343,8 +343,8 @@ public class Breakout extends GraphicsProgram {
 										GLabel Win = new GLabel( " You Win The Game ",(WIDTH /2), (HEIGHT / 2));
 										Win.setFont(new Font("Serif", Font.BOLD, 18));
 										add(Win);
-										
-										break;
+										isMouseClicked=false;
+										return;
 										
 									}
 								
