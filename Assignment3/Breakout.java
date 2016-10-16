@@ -56,11 +56,14 @@ public class Breakout extends GraphicsProgram {
 	private static final int BRICK_Y_OFFSET = 70;
 
 	/** Number of turns */
-	private static final int NTURNS = 3;
+	private static int NTURNS = 3;
+	
+	private static int NumberOfBriks = NBRICK_ROWS* NBRICKS_PER_ROW;
 	
 	private GRect CreatePaddle;
 	private GRect paddleToMove;
 	private GOval Ball;
+
 	
 	
 	private RandomGenerator rgen= RandomGenerator.getInstance();
@@ -68,11 +71,11 @@ public class Breakout extends GraphicsProgram {
 
 	/** VELOCITY of x and y for ball
 	 */
-	private double Vx =  rgen.nextDouble(1.0 , 6);
-	private double Vy = 5; 
+	private double Vx = 5;         // rgen.nextDouble(1.0 , 10);
+	private double Vy = rgen.nextDouble(10,30); 
 	
-	private boolean mouseDragged = true;
-	private boolean isMouseMoving = false;
+	
+	private boolean isMouseClicked = false;
 	
 	private GPoint Last_XYCoOrdinates = new GPoint(2, ( HEIGHT - PADDLE_Y_OFFSET ));
 
@@ -85,6 +88,7 @@ public class Breakout extends GraphicsProgram {
 		CreateBrisk();
 		CreatePaddle();
 		//addMouseListeners();
+	
 		BallInitialPosition();
 		
 		
@@ -97,10 +101,18 @@ public class Breakout extends GraphicsProgram {
 	public void run() {
 		/* You fill this in, along with any subsidiary methods */
 		addMouseListeners();
-		//if( mouseDragged = false )
-		//{
-			MovaBall();
-		//}
+		
+		while(true)
+		{
+			pause(50);
+			if(isMouseClicked== true )
+			{
+				 
+					MovaBall();
+				
+			}	
+		}
+		
 	}
 		
 	
@@ -175,10 +187,14 @@ public class Breakout extends GraphicsProgram {
 		{
 			
 			paddleToMove = tempPaddle;
-			isMouseMoving=true;
+			isMouseClicked=true;
+			
 		}
 		else
+		{
 			paddleToMove=null;
+			//isMouseClicked = false;
+		}
 		
 	}
 	
@@ -194,10 +210,10 @@ public class Breakout extends GraphicsProgram {
 					paddleToMove.move(( e.getX() - Last_XYCoOrdinates.getX()), 0) ;			 
 					Last_XYCoOrdinates = new GPoint( e.getPoint());
 					//print(" \n NEW Last_XYCoOrdinates "  +Last_XYCoOrdinates);
-					mouseDragged =true;
+					
 				}
 			}
-			mouseDragged=false;
+			
 	}
 	private void BallInitialPosition() 
 	{
@@ -215,9 +231,9 @@ public class Breakout extends GraphicsProgram {
 		int rightWall = ( WIDTH - ( 2 * BALL_RADIUS));
 		int leftWall= 0;
 		int topWall = 0;
+	
 		
-		
-		while( ( Ball.getX() > rightWall)  ||  (Ball.getY() > bottomWall)   ||   (Ball.getY() > topWall)     ||      (Ball.getX() > leftWall))
+		while( ( Ball.getX() > rightWall)  ||  (Ball.getY() > bottomWall)   ||   (Ball.getY() > topWall)     ||      (Ball.getX() > leftWall)  || ( NumberOfBriks != 0))
 		{
 			/* if(isMouseMoving == false)
 			{
@@ -250,6 +266,24 @@ public class Breakout extends GraphicsProgram {
 					{
 						Ball.move(Vx, distanceToBottomWall);
 						Vy=-Vy;
+						
+					/*	Ball.setVisible(false);
+						NTURNS --;
+						isMouseClicked=false;
+						if( NTURNS > 0)
+						{
+							
+							BallInitialPosition();
+							
+							break;
+						}
+						
+						
+						else
+						{
+							GameOver();
+						}
+						*/
 					}
 					else if( (distanceToTopWall <=-Vy))
 					{
@@ -262,30 +296,82 @@ public class Breakout extends GraphicsProgram {
 						Vy=-Vy;
 					}
 			
-					else
+					else if( (Ball.getY() - (arrayForBriks[0][9].getY() + BRICK_HEIGHT) )<= -Vy)
 					{
-						for(int j = 0 ; j < 10 ; j++ )
+						
 						{
-							for (int i = 0; i < NBRICKS_PER_ROW; i++)
+							for(int j = 0 ; j < 10 ; j++ )
 							{
-								if( ( (Ball.getY() - (arrayForBriks[i][j].getY() + HEIGHT)) <= -Vy) && ( (Ball.getY() - (arrayForBriks[i][j].getY() + HEIGHT)) >= 0)  &&  ( arrayForBriks[i][j].getX() <= (Ball.getX() + BALL_RADIUS) && ( Ball.getX() + BALL_RADIUS <= (arrayForBriks[i][j].getX() + WIDTH ) ))  ) 
+								for (int i = 0; i < NBRICKS_PER_ROW; i++)
 								{
+									if(arrayForBriks[i][j].isVisible())
+									{
+									double y1Bricks = arrayForBriks[i][j].getY() + BRICK_HEIGHT;
+									double x1Bricks = arrayForBriks[i][j].getX() -1 ;
+									double XOfCircle = Ball.getX() + BALL_RADIUS;
+									double yOfCircle = Ball.getY();
 									
-									remove(arrayForBriks[i][j]);
-									Ball.move(Vx, Vy);
-									Vy=-Vy;
-									break;
+									
+									double y2Bricks = arrayForBriks[i][j].getY() ;
+									double x2Bricks = arrayForBriks[i][j].getX()  ;
+									double X2OfCircle = Ball.getX() ;
+									double y2OfCircle = Ball.getY() + (2 * BALL_RADIUS);
+									
+									boolean bottomEdgeMax = ( (yOfCircle - y1Bricks) <= -Vy);
+									boolean bottomEdgeMin = ( ( yOfCircle -y1Bricks ) >= 0);
+									boolean leftEdge = (x1Bricks <= XOfCircle);
+									boolean rightEdge = XOfCircle <= (x1Bricks + BRICK_WIDTH +1);
+									
+									boolean bottomEdgeMax2 = ( (y2OfCircle - y2Bricks) <= Vy);
+									boolean bottomEdgeMin2 = ( ( y2OfCircle -y2Bricks ) >= 0);
+									boolean leftEdge2 = (x2Bricks <= X2OfCircle);
+									boolean rightEdge2 = X2OfCircle <= (x2Bricks + BRICK_WIDTH +1);
+							
+									if(  ( bottomEdgeMax && bottomEdgeMin  &&   leftEdge && rightEdge)   || (bottomEdgeMax2 && bottomEdgeMin2  &&   leftEdge2 && rightEdge2) )
+									{
+									
+										arrayForBriks[i][j].setVisible(false);
+										NumberOfBriks--;
+										Vy=-Vy;
+										Ball.move(Vx, Vy);
+										
+									
+									}
+									
+									if( NumberOfBriks == 0)
+									{
+										GLabel Win = new GLabel( " You Win The Game ",(WIDTH /2), (HEIGHT / 2));
+										Win.setFont(new Font("Serif", Font.BOLD, 18));
+										add(Win);
+										
+										break;
+										
+									}
+								
+									}
 								}
 							}
+							Ball.move(Vx, Vy);
 						}
+						
+				
+					}
+					else
 						Ball.move(Vx, Vy);
 				
 				
-			}
+			
 		}
 		
 	}
 
+	
+	private void GameOver()
+	{
+		GLabel GameOver=new GLabel("GAME OVER" , (WIDTH /2), (HEIGHT / 2));
+		GameOver.setFont(new Font("Serif", Font.BOLD, 18));
+		add(GameOver);
+	}
 }
 
 
